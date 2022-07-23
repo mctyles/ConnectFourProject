@@ -3,7 +3,16 @@ const playerSelectButton = document.getElementById('player-select-button');
 let playerOptionSelected = 'singleplayer';
 const playerNames = document.getElementById('player-names');
 
-let gameState = {};
+let gameState = {
+    game: [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0]
+    ]
+};
 
 playerSelectMenu.addEventListener('change', function(event){
     playerOptionSelected = event.target.value;
@@ -14,26 +23,41 @@ const boardTable = document.createElement('table');
 
 function setBoard() {
     let rowCount = 0;
+    
     function makeRow(){
-        let slotCount = 0;
         let row = document.createElement('tr');
         row.className ='row';
         boardTable.className = 'board-table';
         for (let i = 0; i < 7; i++) {
-            slotCount++;
             let slot = document.createElement('td');
             slot.className ='slot';
-            slot.setAttribute('id', `row-${rowCount}-slot-${slotCount}`)
+            slot.setAttribute('id', `row-${rowCount}-slot-${i}`);
             row.appendChild(slot);
         }
         boardTable.appendChild(row);
     }
 
+    let gameButtonContainer = document.createElement('div');
+    gameButtonContainer.className = 'game-button-container';
+
+    function makeButtonRow() {
+        for (let i = 0; i < 7; i++) {
+            let dropTokenButton = document.createElement('button');
+            dropTokenButton.className = 'drop-token-button';
+            dropTokenButton.setAttribute('id', `column-${i}`)
+            gameButtonContainer.appendChild(dropTokenButton);
+        }
+    }
+
+    makeButtonRow();
+
     for (let i = 0; i < 6; i++) {
-        rowCount++;
+        rowCount = i;
         makeRow();
         }
-        game.appendChild(boardTable);
+        
+    game.appendChild(gameButtonContainer);
+    game.appendChild(boardTable);
 }
 
 

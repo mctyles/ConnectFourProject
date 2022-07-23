@@ -2,6 +2,12 @@
     background-color: blue;
 }
 
+.drop-token-button {
+    height: 20px;
+    width: 20px;
+    background-color: red;
+}
+
 .slot {
     height: 20px;
     width: 20px;
