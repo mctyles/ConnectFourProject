@@ -9,10 +9,33 @@ playerSelectMenu.addEventListener('change', function(event){
     playerOptionSelected = event.target.value;
 })
 
-function setBoard() {
-    let boardTable = document.createElement('table');
+const game = document.getElementById('game');
+const boardTable = document.createElement('table');
 
+function setBoard() {
+    let rowCount = 0;
+    function makeRow(){
+        let slotCount = 0;
+        let row = document.createElement('tr');
+        row.className ='row';
+        boardTable.className = 'board-table';
+        for (let i = 0; i < 7; i++) {
+            slotCount++;
+            let slot = document.createElement('td');
+            slot.className ='slot';
+            slot.setAttribute('id', `row-${rowCount}-slot-${slotCount}`)
+            row.appendChild(slot);
+        }
+        boardTable.appendChild(row);
+    }
+
+    for (let i = 0; i < 6; i++) {
+        rowCount++;
+        makeRow();
+        }
+        game.appendChild(boardTable);
 }
+
 
 function startGame(){
     let playerNameInput1 = document.querySelector('.player-name-input-1');
@@ -26,10 +49,11 @@ function startGame(){
     let playerList = document.createElement('h3');
     if (!playerNameInput2){
         player2Name = 'Computer';
-    } 
+    }
     playerList.innerText = `Player 1: ${player1Name} vs Player 2: ${player2Name}`;
     playerNames.appendChild(playerList);
     playerNameContainer.remove();
+    setBoard();
 }
 
 function enterPlayerName() {
