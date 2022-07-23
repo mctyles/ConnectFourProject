@@ -5,18 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect Four</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="game-title">
+<header id="game-title">
     <h1>Connect Four</h1>
 </header>
-<section class="player-names">
+<section id="gametype-select">
     <p>Please select a game type:</p>
     <select id="player-select-menu">
         <option value="singleplayer">Single Player</option>
         <option value="twoplayers">Two Players</option>
     </select>
+    <button id="player-select-button">Enter</button>
 </section>
-<section class="game"></section>
+<section id="player-names">
+</section>
+<section id="game"></section>
 </body>
+<script src="app.js"></script>
 </html>
