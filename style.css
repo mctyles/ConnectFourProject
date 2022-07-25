@@ -1,17 +1,58 @@
+* {
+    margin: 0;
+    border-style: border-box;
+}
+
 .board-table {
+    border: black solid 2px;
+    border-radius: 15px;
+    padding: 20px;
     background-color: blue;
 }
 
-.drop-token-button {
-    height: 20px;
-    width: 20px;
-    background-color: red;
+.play-arrow {
+    height: 40px;
+    width: 40px;
+    border-style: solid;
+    border-color: white;
+    border-width: 0px 4px 4px 0px;
+    transform: rotate(45deg);
+    /*font-size: 72px;
+    background-color: bisque;
+    border-radius: 50%;
+    height: 60px;
+    width: 100px;
+    text-align: center;
+    margin-left: 5px;
+    padding-top: 40px;
+    display: none; */
+}
+
+.play-arrow:hover {
+    border-color: black;
+}
+
+.play-arrow-container {
+    width: 730px;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+
+#game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
 }
 
 .slot {
-    height: 20px;
-    width: 20px;
+    height: 100px;
+    width: 100px;
     border-radius: 50%;
-    background-color: gray;
+    background-color: rgb(205, 205, 205);
 }
 

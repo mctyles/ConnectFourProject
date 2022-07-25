@@ -37,26 +37,26 @@ function setBoard() {
         boardTable.appendChild(row);
     }
 
-    let gameButtonContainer = document.createElement('div');
-    gameButtonContainer.className = 'game-button-container';
+    let playArrowContainer = document.createElement('div');
+    playArrowContainer.className = 'play-arrow-container';
 
-    function makeButtonRow() {
+    function makePlayArrow() {
         for (let i = 0; i < 7; i++) {
-            let dropTokenButton = document.createElement('button');
-            dropTokenButton.className = 'drop-token-button';
-            dropTokenButton.setAttribute('id', `column-${i}`)
-            gameButtonContainer.appendChild(dropTokenButton);
+            let playArrow = document.createElement('div');
+            playArrow.className = 'play-arrow';
+            playArrow.setAttribute('id', `arrow-column-${i}`)
+            playArrowContainer.appendChild(playArrow);
         }
     }
 
-    makeButtonRow();
+    makePlayArrow();
 
     for (let i = 0; i < 6; i++) {
         rowCount = i;
         makeRow();
         }
         
-    game.appendChild(gameButtonContainer);
+    game.appendChild(playArrowContainer);
     game.appendChild(boardTable);
 }
 
