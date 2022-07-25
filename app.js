@@ -3,14 +3,17 @@ const playerSelectButton = document.getElementById('player-select-button');
 let playerOptionSelected = 'singleplayer';
 const playerNames = document.getElementById('player-names');
 
+
+
 let gameState = {
     game: [
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]
+//           0  1  2  3  4  5  6
+            [0, 0, 0, 0, 0, 0, 0], //0
+            [0, 0, 0, 0, 0, 0, 0], //1
+            [0, 0, 0, 0, 0, 0, 0], //2
+            [0, 0, 0, 0, 0, 0, 0], //3
+            [0, 0, 0, 0, 0, 0, 0], //4
+            [0, 0, 0, 0, 0, 0, 0]  //5
     ]
 };
 
@@ -21,9 +24,33 @@ playerSelectMenu.addEventListener('change', function(event){
 const game = document.getElementById('game');
 const boardTable = document.createElement('table');
 
+let slotOpen = true;
+
+function checkSlots(columnNum) {
+    for (let i = 5; i >= 0; i--) {
+        if (gameState.game[i][columnNum] === 0){
+            gameState.game[i][columnNum] = 'mark';
+            break;
+        }
+    }
+}
+
+/* function playTurn(event) {
+    checkSlots(Number(event.target.id));
+    for (let i = 5; i >= 0; i--) {
+        if (gameState.game[i][Number(event.target.id)] === 'mark') {
+            let currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
+            currentOpenSlot.style.backgroundColor = 'yellow';
+        }
+    }
+} */
+
+let player1turn = true;
+let playerNumber = 0;
+let tileColor = '';
+
 function setBoard() {
-    let rowCount = 0;
-    
+    let rowCount = 0;   
     function makeRow(){
         let row = document.createElement('tr');
         row.className ='row';
@@ -44,7 +71,7 @@ function setBoard() {
         for (let i = 0; i < 7; i++) {
             let playArrow = document.createElement('div');
             playArrow.className = 'play-arrow';
-            playArrow.setAttribute('id', `arrow-column-${i}`)
+            playArrow.setAttribute('id', `${i}`)
             playArrowContainer.appendChild(playArrow);
         }
     }
@@ -58,6 +85,29 @@ function setBoard() {
         
     game.appendChild(playArrowContainer);
     game.appendChild(boardTable);
+    playArrowContainer.addEventListener('click', function(event){   
+        
+        if (player1turn){
+            playerNumber = 1;
+            tileColor = 'yellow';
+        } else {
+            playerNumber = 2;
+            tileColor = 'red';
+        }
+        
+        if (event.target.className === 'play-arrow'){
+            let currentOpenSlot = '';
+            checkSlots(Number(event.target.id));
+            for (let i = 5; i >= 0; i--) {
+                if (gameState.game[i][Number(event.target.id)] === 'mark') {
+                    currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
+                    currentOpenSlot.style.backgroundColor = `${tileColor}`;
+                    gameState.game[i][Number(event.target.id)] = playerNumber;
+                    player1turn = player1turn !== true;
+                }
+            }
+        }
+    });
 }
 
 
@@ -91,7 +141,7 @@ function enterPlayerName() {
     playerNameText1.className = 'player-name-text-1';
     playerNameInput1.className = 'player-name-input-1';
     playerNameButton.className = 'player-name-button';
-    playerNameText1.innerText = "Enter your name here:";
+    playerNameText1.innerText = "Enter your name:";
     playerNameButton.innerText = "Start";
     playerNames.appendChild(playerNameContainer);
     playerNameContainer.appendChild(playerNameText1);
@@ -100,7 +150,9 @@ function enterPlayerName() {
         let playerNameText2 = document.createElement('p');
         let playerNameInput2 = document.createElement('input');
         playerNameText2.className = 'player-name-text-2';
+        playerNameText1.innerText = "Enter Player 1 name:";
         playerNameInput2.className = 'player-name-input-2';
+        playerNameText2.innerText = "Enter Player 2 name:";
         playerNameContainer.appendChild(playerNameText2);
         playerNameContainer.appendChild(playerNameInput2);
     }
