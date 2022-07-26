@@ -14,6 +14,10 @@
 }
 
 #gametype-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
     text-align: center;
     font-family: 'Special Elite', cursive;
     font-size: 48px;

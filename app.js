@@ -24,8 +24,6 @@ playerSelectMenu.addEventListener('change', function(event){
 const game = document.getElementById('game');
 const boardTable = document.createElement('table');
 
-let slotOpen = true;
-
 function checkSlots(columnNum) {
     for (let i = 5; i >= 0; i--) {
         if (gameState.game[i][columnNum] === 0){
@@ -48,6 +46,20 @@ function checkSlots(columnNum) {
 let player1turn = true;
 let playerNumber = 0;
 let tileColor = '';
+
+function getRandomColumnNum() {
+    return Math.floor(Math.random() * 6)
+}
+
+function determineTurn (){
+    if (player1turn){
+        playerNumber = 1;
+        tileColor = 'yellow';
+    } else {
+        playerNumber = 2;
+        tileColor = 'red';
+    }
+}
 
 function setBoard() {
     let rowCount = 0;   
@@ -87,17 +99,10 @@ function setBoard() {
     game.appendChild(boardTable);
     playArrowContainer.addEventListener('click', function(event){   
         
-        if (player1turn){
-            playerNumber = 1;
-            tileColor = 'yellow';
-        } else {
-            playerNumber = 2;
-            tileColor = 'red';
-        }
-        
         if (event.target.className === 'play-arrow'){
             let currentOpenSlot = '';
             checkSlots(Number(event.target.id));
+            determineTurn();
             for (let i = 5; i >= 0; i--) {
                 if (gameState.game[i][Number(event.target.id)] === 'mark') {
                     currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
@@ -106,10 +111,26 @@ function setBoard() {
                     player1turn = player1turn !== true;
                 }
             }
+            if (oneplayer) {
+                determineTurn();
+                let randomColumnNum = getRandomColumnNum();
+                checkSlots(randomColumnNum);
+                for (let i = 5; i >= 0; i--) {
+                    if (gameState.game[i][randomColumnNum] === 'mark'){
+                        currentOpenSlot = document.getElementById(`row-${i}-slot-${randomColumnNum}`)
+                        currentOpenSlot.style.backgroundColor = `${tileColor}`;
+                        gameState.game[i][randomColumnNum] = playerNumber;
+                        player1turn = player1turn !== true;
+                    }
+                }
+            }
         }
     });
 }
 
+function checkForWin (){
+
+}
 
 function startGame(){
     let playerNameInput1 = document.querySelector('.player-name-input-1');
@@ -130,6 +151,8 @@ function startGame(){
     setBoard();
 }
 
+let oneplayer = true;
+
 function enterPlayerName() {
     const gametypeSelect = document.getElementById('gametype-select');
     gametypeSelect.remove();
@@ -147,6 +170,7 @@ function enterPlayerName() {
     playerNameContainer.appendChild(playerNameText1);
     playerNameContainer.appendChild(playerNameInput1);
         if (playerOptionSelected === 'twoplayers') {
+        oneplayer = false;
         let playerNameText2 = document.createElement('p');
         let playerNameInput2 = document.createElement('input');
         playerNameText2.className = 'player-name-text-2';
