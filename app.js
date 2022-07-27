@@ -17,6 +17,7 @@ function initializeGame (){
                     [0, 0, 0, 0, 0, 0, 0], //4
                     [0, 0, 0, 0, 0, 0, 0]  //5
             ]
+    gameState.indexLastPlay = [];
     gameState.player1turn = true;
     gameState.playerNumber = 0;
     gameState.tileColor = '';
@@ -53,9 +54,10 @@ function determineTurn (){
         gameState.playerNumber = 2;
         gameState.tileColor = 'red';
     }
+    gameState.indexLastPlay = [];  
 }
 
-function updateTurnStatus() {
+function updateTurnStatusText() {
     if (gameState.player1turn) {
         gameState.currentPlayerName = `${gameState.player1Name}`;
     } else {
@@ -101,8 +103,8 @@ function setBoard() {
     gameContainer.appendChild(playArrowContainer);
     gameContainer.appendChild(boardTable);
     
-    updateTurnStatus();
-    playArrowContainer.addEventListener('click', function(event){   
+    updateTurnStatusText();
+    playArrowContainer.addEventListener('click', function(event){ 
         if (event.target.className === 'play-arrow'){
             let currentOpenSlot = '';
             checkSlots(Number(event.target.id));
@@ -112,11 +114,13 @@ function setBoard() {
                     currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
                     currentOpenSlot.style.backgroundColor = `${gameState.tileColor}`;
                     gameState.game[i][Number(event.target.id)] = gameState.playerNumber;
-                    gameState.indexLastPlay = [i, Number(event.target.id)];
+                    gameState.indexLastPlay.push(i);
+                    gameState.indexLastPlay.push(Number(event.target.id));
                     gameState.player1turn = gameState.player1turn !== true;
+                    checkForWin();
                 }
             }
-            updateTurnStatus();
+            updateTurnStatusText();
             if (gameState.oneplayer) {
                 determineTurn();
                 let randomColumnNum = getRandomColumnNum();
@@ -126,30 +130,34 @@ function setBoard() {
                         currentOpenSlot = document.getElementById(`row-${i}-slot-${randomColumnNum}`)
                         currentOpenSlot.style.backgroundColor = `${gameState.tileColor}`;
                         gameState.game[i][randomColumnNum] = gameState.playerNumber;
-                        gameState.indexLastPlay = [i, Number(event.target.id)];
+                        gameState.indexLastPlay.push(i);
+                        gameState.indexLastPlay.push(Number(event.target.id));
                         gameState.player1turn = gameState.player1turn !== true;
+                        checkForWin();
                     }
                 }
-                updateTurnStatus();
+                updateTurnStatusText();
             }
         }
+        checkForWin();
     });
-}
-
-function checkForWin (){
 }
 
 function checkRowForWin(){
     let rowNumPlayed = gameState.indexLastPlay[0];
-    let ColNumPlayed = gameState.indexLastPlay[1];
     let tileMatchCount = 0;
     for (let i = 0; i < 7; i++) {
-        if (gameState.game[rowNumPlayed][i] === gameState.game[rowNumPlayed][i - 1]) {
+        if (gameState.game[rowNumPlayed][i] === undefined) {
+            break;
+        }
+        if (gameState.game[rowNumPlayed][i] !== 0 && gameState.game[rowNumPlayed][i] === gameState.game[rowNumPlayed][i - 1]) {
             tileMatchCount++;
+        } else {
+            tileMatchCount = 0;
         }
-        if (tileMatchCount >= 4) {
-            gameState.win = true;
-        }
+    }
+    if (tileMatchCount >= 4) {
+        gameState.win = true;
     }
 }
 
@@ -157,15 +165,94 @@ function checkColumnForWin(){
     let colNumPlayed = gameState.indexLastPlay[1];
     let tileMatchCount = 0;
     for (let i = 0; i < 7; i++) {
-        if (gameState.game[i][colNumPlayed] === gameState.game[i - 1][colNumPlayed]) {
+        if (gameState.game[i][colNumPlayed] === undefined){
+            break;
+        }
+        if (gameState.game[i][colNumPlayed] !== 0 && gameState.game[i][colNumPlayed] === gameState.game[i - 1][colNumPlayed]){
             tileMatchCount++;
+        } else {
+            tileMatchCount = 0;
         }
-        if (tileMatchCount >= 4) {
-            gameState.win = true;
-        }
+    }
+    if (tileMatchCount >= 4) {
+        gameState.win = true;
     }
 }
 
+
+function checkPositiveDiagForWin() {
+    let rowNumPlayed = gameState.indexLastPlay[0];
+    let ColNumPlayed = gameState.indexLastPlay[1];
+    let tileMatchCount = 0; 
+    let newTile = gameState.game[rowNumPlayed][ColNumPlayed];
+    for (let i = 0; i < 6; i ++){
+        newTile = gameState.game[rowNumPlayed++][ColNumPlayed--];
+        rowNumPlayed++;
+        ColNumPlayed--;
+        if (newTile === undefined) {
+            newTile = gameState.game[rowNumPlayed - 1][ColNumPlayed + 1];
+            rowNumPlayed--;
+            ColNumPlayed++;
+            break;
+        }
+    }
+    for (let i = 0; i < 6; i ++) {
+        newTile = gameState.game[rowNumPlayed--][ColNumPlayed++];
+        if (newTile === undefined) {
+            break;
+        }
+        if (newTile !== 0 && newTile === gameState.game[rowNumPlayed + 1][ColNumPlayed - 1]){
+            tileMatchCount++;
+        } else {
+            tileMatchCount = 0;
+        }
+    }
+    if (tileMatchCount >= 4) {
+        gameState.win = true;
+    }
+}
+
+function checkNegativeDiagForWin() {
+    let rowNumPlayed = gameState.indexLastPlay[0];
+    let ColNumPlayed = gameState.indexLastPlay[1];
+    let tileMatchCount = 0; 
+    let newTile = gameState.game[rowNumPlayed][ColNumPlayed];
+    for (let i = 0; i < 6; i ++){
+        newTile = gameState.game[rowNumPlayed--][ColNumPlayed++];
+        rowNumPlayed--;
+        ColNumPlayed++;
+        if (newTile === undefined) {
+            newTile = gameState.game[rowNumPlayed + 1][ColNumPlayed - 1];
+            rowNumPlayed++;
+            ColNumPlayed--;
+            break;
+        }
+    }
+    for (let i = 0; i < 6; i ++) {
+        newTile = gameState.game[rowNumPlayed++][ColNumPlayed--];
+        if (newTile === undefined) {
+            break;
+        }
+        if (newTile !== 0 && newTile === gameState.game[rowNumPlayed - 1][ColNumPlayed + 1]){
+            tileMatchCount++;
+        } else {
+            tileMatchCount = 0;
+        }
+    }
+    if (tileMatchCount >= 4) {
+        gameState.win = true;
+    }
+}
+
+function checkForWin(){
+    checkRowForWin();
+    checkColumnForWin();
+    checkPositiveDiagForWin();
+    checkNegativeDiagForWin();
+    if (gameState.win) {
+        turnStatus.innerText = `${gameState.currentPlayerName} Wins!`
+    }
+}
 
 function startGame(){
     let playerNameInput1 = document.querySelector('.player-name-input-1');
