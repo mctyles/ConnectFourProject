@@ -70,6 +70,7 @@ h3 {
     align-items: center;
     align-content: center;
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 .slot {
@@ -79,3 +80,8 @@ h3 {
     background-color: rgb(205, 205, 205);
 }
 
+#turn-status {
+    text-align: center;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 48px;
+}

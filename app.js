@@ -2,26 +2,34 @@ const playerSelectMenu = document.getElementById('player-select-menu');
 const playerSelectButton = document.getElementById('player-select-button');
 let playerOptionSelected = 'singleplayer';
 const playerNames = document.getElementById('player-names');
+const turnStatus = document.getElementById('turn-status');
 
 
+let gameState = {};
 
-let gameState = {
-    game: [
-//           0  1  2  3  4  5  6
-            [0, 0, 0, 0, 0, 0, 0], //0
-            [0, 0, 0, 0, 0, 0, 0], //1
-            [0, 0, 0, 0, 0, 0, 0], //2
-            [0, 0, 0, 0, 0, 0, 0], //3
-            [0, 0, 0, 0, 0, 0, 0], //4
-            [0, 0, 0, 0, 0, 0, 0]  //5
-    ]
-};
+function initializeGame (){
+    gameState.game = [
+        //           0  1  2  3  4  5  6
+                    [0, 0, 0, 0, 0, 0, 0], //0
+                    [0, 0, 0, 0, 0, 0, 0], //1
+                    [0, 0, 0, 0, 0, 0, 0], //2
+                    [0, 0, 0, 0, 0, 0, 0], //3
+                    [0, 0, 0, 0, 0, 0, 0], //4
+                    [0, 0, 0, 0, 0, 0, 0]  //5
+            ]
+    gameState.player1turn = true;
+    gameState.playerNumber = 0;
+    gameState.tileColor = '';
+    gameState.oneplayer = true;
+    gameState.currentPlayerName = '';
+    gameState.win = false;
+}
 
 playerSelectMenu.addEventListener('change', function(event){
     playerOptionSelected = event.target.value;
 })
 
-const game = document.getElementById('game');
+const gameContainer = document.getElementById('game');
 const boardTable = document.createElement('table');
 
 function checkSlots(columnNum) {
@@ -33,32 +41,27 @@ function checkSlots(columnNum) {
     }
 }
 
-/* function playTurn(event) {
-    checkSlots(Number(event.target.id));
-    for (let i = 5; i >= 0; i--) {
-        if (gameState.game[i][Number(event.target.id)] === 'mark') {
-            let currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
-            currentOpenSlot.style.backgroundColor = 'yellow';
-        }
-    }
-} */
-
-let player1turn = true;
-let playerNumber = 0;
-let tileColor = '';
-
 function getRandomColumnNum() {
     return Math.floor(Math.random() * 6)
 }
 
 function determineTurn (){
-    if (player1turn){
-        playerNumber = 1;
-        tileColor = 'yellow';
+    if (gameState.player1turn){
+        gameState.playerNumber = 1;
+        gameState.tileColor = 'yellow';
     } else {
-        playerNumber = 2;
-        tileColor = 'red';
+        gameState.playerNumber = 2;
+        gameState.tileColor = 'red';
     }
+}
+
+function updateTurnStatus() {
+    if (gameState.player1turn) {
+        gameState.currentPlayerName = `${gameState.player1Name}`;
+    } else {
+        gameState.currentPlayerName = `${gameState.player2Name}`
+    }
+    turnStatus.innerText = `It's ${gameState.currentPlayerName}'s turn!`
 }
 
 function setBoard() {
@@ -95,10 +98,11 @@ function setBoard() {
         makeRow();
         }
         
-    game.appendChild(playArrowContainer);
-    game.appendChild(boardTable);
+    gameContainer.appendChild(playArrowContainer);
+    gameContainer.appendChild(boardTable);
+    
+    updateTurnStatus();
     playArrowContainer.addEventListener('click', function(event){   
-        
         if (event.target.className === 'play-arrow'){
             let currentOpenSlot = '';
             checkSlots(Number(event.target.id));
@@ -106,54 +110,84 @@ function setBoard() {
             for (let i = 5; i >= 0; i--) {
                 if (gameState.game[i][Number(event.target.id)] === 'mark') {
                     currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
-                    currentOpenSlot.style.backgroundColor = `${tileColor}`;
-                    gameState.game[i][Number(event.target.id)] = playerNumber;
-                    player1turn = player1turn !== true;
+                    currentOpenSlot.style.backgroundColor = `${gameState.tileColor}`;
+                    gameState.game[i][Number(event.target.id)] = gameState.playerNumber;
+                    gameState.indexLastPlay = [i, Number(event.target.id)];
+                    gameState.player1turn = gameState.player1turn !== true;
                 }
             }
-            if (oneplayer) {
+            updateTurnStatus();
+            if (gameState.oneplayer) {
                 determineTurn();
                 let randomColumnNum = getRandomColumnNum();
                 checkSlots(randomColumnNum);
                 for (let i = 5; i >= 0; i--) {
                     if (gameState.game[i][randomColumnNum] === 'mark'){
                         currentOpenSlot = document.getElementById(`row-${i}-slot-${randomColumnNum}`)
-                        currentOpenSlot.style.backgroundColor = `${tileColor}`;
-                        gameState.game[i][randomColumnNum] = playerNumber;
-                        player1turn = player1turn !== true;
+                        currentOpenSlot.style.backgroundColor = `${gameState.tileColor}`;
+                        gameState.game[i][randomColumnNum] = gameState.playerNumber;
+                        gameState.indexLastPlay = [i, Number(event.target.id)];
+                        gameState.player1turn = gameState.player1turn !== true;
                     }
                 }
+                updateTurnStatus();
             }
         }
     });
 }
 
 function checkForWin (){
-
 }
+
+function checkRowForWin(){
+    let rowNumPlayed = gameState.indexLastPlay[0];
+    let ColNumPlayed = gameState.indexLastPlay[1];
+    let tileMatchCount = 0;
+    for (let i = 0; i < 7; i++) {
+        if (gameState.game[rowNumPlayed][i] === gameState.game[rowNumPlayed][i - 1]) {
+            tileMatchCount++;
+        }
+        if (tileMatchCount >= 4) {
+            gameState.win = true;
+        }
+    }
+}
+
+function checkColumnForWin(){
+    let colNumPlayed = gameState.indexLastPlay[1];
+    let tileMatchCount = 0;
+    for (let i = 0; i < 7; i++) {
+        if (gameState.game[i][colNumPlayed] === gameState.game[i - 1][colNumPlayed]) {
+            tileMatchCount++;
+        }
+        if (tileMatchCount >= 4) {
+            gameState.win = true;
+        }
+    }
+}
+
 
 function startGame(){
     let playerNameInput1 = document.querySelector('.player-name-input-1');
     let playerNameInput2 = document.querySelector('.player-name-input-2');
     let playerNameContainer = document.querySelector('.player-name-container');
-    let player1Name = playerNameInput1.value;
-    let player2Name = '';
+    gameState.player1Name = playerNameInput1.value;
+    gameState.player2Name = '';
     if (playerOptionSelected === 'twoplayers') {
-        player2Name = playerNameInput2.value;
+        gameState.player2Name = playerNameInput2.value;
     }
     let playerList = document.createElement('h3');
     if (!playerNameInput2){
-        player2Name = 'Computer';
+        gameState.player2Name = 'Computer';
     }
-    playerList.innerText = `Player 1: ${player1Name} vs Player 2: ${player2Name}`;
+    playerList.innerText = `Player 1: ${gameState.player1Name} vs Player 2: ${gameState.player2Name}`;
     playerNames.appendChild(playerList);
     playerNameContainer.remove();
     setBoard();
 }
 
-let oneplayer = true;
-
 function enterPlayerName() {
+    initializeGame();
     const gametypeSelect = document.getElementById('gametype-select');
     gametypeSelect.remove();
     let playerNameContainer = document.createElement('div');
@@ -170,7 +204,7 @@ function enterPlayerName() {
     playerNameContainer.appendChild(playerNameText1);
     playerNameContainer.appendChild(playerNameInput1);
         if (playerOptionSelected === 'twoplayers') {
-        oneplayer = false;
+        gameState.oneplayer = false;
         let playerNameText2 = document.createElement('p');
         let playerNameInput2 = document.createElement('input');
         playerNameText2.className = 'player-name-text-2';
