@@ -178,32 +178,75 @@ function setBoard() {
                     checkForWin();
                     if (!state.win) {
                         updateTurnStatusText();
+                    } else {
+                        turnStatus.innerText = `${state.currentPlayerName} Wins!`
                     }
                 }
             }
             if (state.oneplayer && !state.win) {
                 determineTurn();
-                let randomColumnNum = getRandomColumnNum();
-                checkSlots(randomColumnNum);
-                for (let i = 5; i >= 0; i--) {
-                    if (state.game[i][randomColumnNum] === 'mark'){
-                        currentOpenSlot = document.getElementById(`row-${i}-slot-${randomColumnNum}`)
-                        currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
-                        state.game[i][randomColumnNum] = state.playerNumber;
-                        state.rowNumPlayed = i;
-                        state.colNumPlayed = Number(event.target.id);
+                for (let i = 0; i < 7; i++){
+                    checkSlots(i);
+                    for (let j = 5; j >= 0; j--) {
+                        if (state.game[j][i] === 'mark') {
+                            state.game[j][i] = 2;
+                            state.rowNumPlayed = j;
+                            state.colNumPlayed = i;
+                            checkForWin();
+                            if (state.win){
+                                currentOpenSlot = document.getElementById(`row-${j}-slot-${i}`)
+                                currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
+                                break;
+                            }
+                            if (!state.win) {
+                                state.game[j][i] = 1;
+                                state.playerNumber = 1;
+                                state.rowNumPlayed = j;
+                                state.colNumPlayed = i;
+                                checkForWin();
+                                if (state.win){
+                                    state.win = false;
+                                    state.game[j][i] = 2;
+                                    state.playerNumber = 2;
+                                    currentOpenSlot = document.getElementById(`row-${j}-slot-${i}`)
+                                    currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
+                                } else {
+                                state.playerNumber = 2;
+                                state.game[j][i] = 0;
+                                }
+                            }
+                        }
+                    }
+                    if (state.game[state.rowNumPlayed][state.colNumPlayed] === 2){
+                        break;
+                    }
+                }
+                if (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
+                            let randomColumnNum = getRandomColumnNum();
+                            checkSlots(randomColumnNum);
+                            for (let j = 5; j >= 0; j--) {
+                            if (state.game[j][randomColumnNum] === 'mark'){
+                            currentOpenSlot = document.getElementById(`row-${j}-slot-${randomColumnNum}`)
+                            currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
+                            state.game[j][randomColumnNum] = state.playerNumber;
+                            state.rowNumPlayed = j;
+                            state.colNumPlayed = randomColumnNum;
+                                    }
+                                }
+                            }
                         state.player1turn = state.player1turn !== true;
                         checkForWin();
                         if (!state.win) {
                             updateTurnStatusText();
+                        } else {
+                            turnStatus.innerText = `${state.currentPlayerName} Wins!`
                         }
                         console.log('test')
                     }
                 }
-            }
-        }
     });
 }
+
 
 function checkRowForWin(row, column){
     let tileMatchCount = 0;
@@ -311,29 +354,4 @@ function checkForWin(){
     checkColumnForWin(rowNum, colNum);
     checkPositiveDiagForWin(rowNum, colNum);
     checkNegativeDiagForWin(rowNum, colNum);
-    if (state.win) {
-        turnStatus.innerText = `${state.currentPlayerName} Wins!`
-    }
 }
-
-/* for (let i = 0; i < 6; i++){
-    checkSlots(i);
-    for (let j = 5; j >= 0; j--) {
-        if (state.game[j][i] === 'mark') {
-            state.game[j][i] = 2;
-            checkForWin();
-            if (!state.win) {
-                state.game[j][i] = 1;
-                checkForWin();
-                if (state.win){
-                    state.game[j][i] = 2;
-                    currentOpenSlot = document.getElementById(`row-${j}-slot-${i}`)
-                    currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
-                } else {
-
-                }
-            }
-        }
-    }
-}
-*/
