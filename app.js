@@ -168,9 +168,9 @@ function setBoard() {
             determineTurn();
             playTurn();
             if (state.oneplayer && !state.win) {
-                setTimeout(computerPlayTurn, 500);
-                    } 
-                }
+                    setTimeout(computerPlayTurn, 500);
+                } 
+            }
     });
 } 
 
@@ -231,7 +231,7 @@ function computerPlayTurn(){
             break;
             }
         }
-    if (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
+    while (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
         let randomColumnNum = getRandomColumnNum();
         checkSlots(randomColumnNum);
         for (let j = 5; j >= 0; j--) {
