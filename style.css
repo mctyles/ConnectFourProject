@@ -60,6 +60,12 @@
     margin-bottom: 20px;
 }
 
+#replay-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 h1 {
     color:red;
     text-align: center;
