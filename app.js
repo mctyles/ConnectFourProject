@@ -13,9 +13,9 @@ function initializeGame (){
     state.player1turn = true;
     state.playerNumber = 0;
     state.tileColor = '';
-    state.oneplayer = true;
     state.currentPlayerName = '';
     state.win = false;
+    state.draw = false;
     state.rowNumPlayed = 0;
     state.colNumPlayed = 0;
 }
@@ -57,6 +57,8 @@ function enterPlayerName() {
         playerNameText2.innerText = "Enter Player 2 name:";
         playerNameContainer.appendChild(playerNameText2);
         playerNameContainer.appendChild(playerNameInput2);
+    } else {
+        state.oneplayer = true;
     }
         playerNameContainer.appendChild(playerNameButton);
         playerNameButton.addEventListener('click', startGame);
@@ -95,8 +97,20 @@ function checkSlots(columnNum) {
     }
 }
 
-function getRandomColumnNum() {
+function getRandomNum() {
     return Math.floor(Math.random() * 6)
+}
+
+function randomizeFirstPlay (){
+    let randomNum = getRandomNum();
+    if (randomNum % 2 === 1) {
+        state.player1turn = true;
+    } else {
+        state.player1turn = false;
+    }
+    if (!state.player1turn && state.oneplayer) {
+        setTimeout(computerPlayTurn, 500);
+    }
 }
 
 function determineTurn (){
@@ -120,6 +134,16 @@ function updateTurnStatusText() {
         turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';       
     }
     turnStatus.innerText = `It's ${state.currentPlayerName}'s turn!`
+}
+
+function displayGameEndText(){
+    if (state.win) {
+    state.player1turn = state.player1turn !== true;
+    turnStatus.innerText = `${state.currentPlayerName} Wins!`
+    } else if (state.draw) {
+        turnStatus.style.color = 'black';
+        turnStatus.innerText = "It's a draw!"
+    }
 }
 
 function setBoard() {
@@ -159,7 +183,9 @@ function setBoard() {
     gameContainer.appendChild(playArrowContainer);
     gameContainer.appendChild(boardTable);
     
+    randomizeFirstPlay();
     updateTurnStatusText();
+    determineTurn();
     
     playArrowContainer.addEventListener('click', function(event){ 
         if (event.target.className === 'play-arrow' && !state.win){
@@ -184,11 +210,12 @@ function playTurn(){
             state.colNumPlayed = Number(event.target.id);
             state.player1turn = state.player1turn !== true;
             checkForWin();
-            if (!state.win) {
-                updateTurnStatusText();
-            } else {
-                turnStatus.innerText = `${state.currentPlayerName} Wins!`
+            checkForDraw();
+            if (state.win || state.draw) {
+                displayGameEndText();
                 createReplayButton();
+            } else {
+                updateTurnStatusText();
             }
         }
     }
@@ -232,7 +259,7 @@ function computerPlayTurn(){
             }
         }
     while (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
-        let randomColumnNum = getRandomColumnNum();
+        let randomColumnNum = getRandomNum();
         checkSlots(randomColumnNum);
         for (let j = 5; j >= 0; j--) {
             if (state.game[j][randomColumnNum] === 'mark'){
@@ -246,12 +273,13 @@ function computerPlayTurn(){
     }
     state.player1turn = state.player1turn !== true;
     checkForWin();
-    if (!state.win) {
-        updateTurnStatusText();
-        } else {
-        turnStatus.innerText = `${state.currentPlayerName} Wins!`
+    checkForDraw();
+    if (state.win || state.draw) {
+        displayGameEndText();
         createReplayButton();
-        }
+    } else {
+        updateTurnStatusText();
+    }
 }
 
 function checkRowForWin(row, column){
@@ -358,6 +386,21 @@ function checkForWin(){
     checkNegativeDiagForWin(rowNum, colNum);
 }
 
+function checkForDraw() {
+    for (let i = 0; i < 7; i++){
+        if (state.game[0][i - 1] === 0){
+            break;
+        }
+        for (let j = 0; j < 6; j++){
+        if (state.game[j][i] === 0){
+            break;
+        } else if (state.game[j][i] !== 0 && i === 6 && j === 5 && !state.win) {
+            state.draw = true;
+        }
+        }
+    }
+}
+
 function createReplayButton(){
     const replayContainer = document.getElementById('replay-container');
     replayButton = document.createElement('button');
@@ -379,3 +422,4 @@ function playAgain(){
     }
     replayButton.remove();
 }
+
