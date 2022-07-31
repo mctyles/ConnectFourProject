@@ -2,13 +2,12 @@ let state = {};
 
 function initializeGame (){
     state.game = [
-        //           0  1  2  3  4  5  6
-                    [0, 0, 0, 0, 0, 0, 0], //0
-                    [0, 0, 0, 0, 0, 0, 0], //1
-                    [0, 0, 0, 0, 0, 0, 0], //2
-                    [0, 0, 0, 0, 0, 0, 0], //3
-                    [0, 0, 0, 0, 0, 0, 0], //4
-                    [0, 0, 0, 0, 0, 0, 0]  //5
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0]
             ];
     state.player1turn = true;
     state.playerNumber = 0;
@@ -20,6 +19,7 @@ function initializeGame (){
     state.colNumPlayed = 0;
 }
 
+const gametypeSelect = document.getElementById('gametype-select');
 const playerSelectMenu = document.getElementById('player-select-menu');
 const playerSelectButton = document.getElementById('player-select-button');
 const playerNames = document.getElementById('player-names');
@@ -32,7 +32,6 @@ playerSelectMenu.addEventListener('change', function(event){
 
 function enterPlayerName() {
     initializeGame();
-    const gametypeSelect = document.getElementById('gametype-select');
     gametypeSelect.remove();
     let playerNameContainer = document.createElement('div');
     let playerNameText1 = document.createElement('p');
@@ -79,6 +78,7 @@ function startGame(){
         state.player2Name = playerNameInput2.value;
     }
     let playerList = document.createElement('h3');
+    playerList.setAttribute('id', 'player-list')
     if (!playerNameInput2){
         state.player2Name = 'Computer';
     }
@@ -133,17 +133,7 @@ function updateTurnStatusText() {
         turnStatus.style.color = 'red';
         turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';       
     }
-    turnStatus.innerText = `It's ${state.currentPlayerName}'s turn!`
-}
-
-function displayGameEndText(){
-    if (state.win) {
-    state.player1turn = state.player1turn !== true;
-    turnStatus.innerText = `${state.currentPlayerName} Wins!`
-    } else if (state.draw) {
-        turnStatus.style.color = 'black';
-        turnStatus.innerText = "It's a draw!"
-    }
+    turnStatus.innerText = `It's ${state.currentPlayerName}'s turn! Click the arrow above the column you would like to play.`
 }
 
 function setBoard() {
@@ -194,7 +184,7 @@ function setBoard() {
             determineTurn();
             playTurn();
             if (state.oneplayer && !state.win) {
-                    setTimeout(computerPlayTurn, 500);
+                    setTimeout(computerPlayTurn, 600);
                 } 
             }
     });
@@ -401,6 +391,16 @@ function checkForDraw() {
     }
 }
 
+function displayGameEndText(){
+    if (state.win) {
+    state.player1turn = state.player1turn !== true;
+    turnStatus.innerText = `${state.currentPlayerName} Wins!`
+    } else if (state.draw) {
+        turnStatus.style.color = 'black';
+        turnStatus.innerText = "It's a draw!"
+    }
+}
+
 function createReplayButton(){
     const replayContainer = document.getElementById('replay-container');
     replayButton = document.createElement('button');
@@ -408,18 +408,46 @@ function createReplayButton(){
     replayContainer.appendChild(replayButton);
     replayButton.setAttribute('id', 'replay-button');
     replayButton.addEventListener('click', playAgain);
+    backToMenuButton = document.createElement('button');
+    backToMenuButton.innerText = "Back to Menu";
+    replayContainer.appendChild(backToMenuButton);
+    backToMenuButton.setAttribute('id', 'back-to-menu-button');
+    backToMenuButton.addEventListener('click', backToMenu);
 }
 
-function playAgain(){
+function boardReset(){
     let currentSlot;
-    initializeGame();
-    updateTurnStatusText();
     for (let i = 0; i < 7; i++){
         for (let j = 0; j < 6; j++){
             currentSlot = document.getElementById(`row-${j}-slot-${i}`)
             currentSlot.style.backgroundColor = `${state.tileColor}`;
         }
     }
-    replayButton.remove();
 }
 
+function playAgain(){
+    initializeGame();
+    updateTurnStatusText();
+    boardReset();
+    replayButton.remove();
+    backToMenuButton.remove();
+}
+
+function backToMenu(){
+    let currentArrowContainer = document.querySelector('.play-arrow-container');
+    let currentBoardTable = document.querySelector('.board-table');
+    let playerList = document.getElementById('player-list');
+    for (let i = 0; i < 7; i++){
+        for (let j = 0; j < 6; j++){
+            let currentSlot = document.getElementById(`row-${j}-slot-${i}`)
+            currentSlot.remove();
+        }
+    }
+    currentBoardTable.remove();
+    currentArrowContainer.remove();
+    playerList.remove();
+    turnStatus.innerText = '';
+    document.body.appendChild(gametypeSelect);
+    replayButton.remove();
+    backToMenuButton.remove();
+}
