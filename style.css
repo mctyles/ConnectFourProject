@@ -3,19 +3,32 @@
     margin: 0;
     border-style: border-box;
     font-family: 'Urbanist', sans-serif;
-    font-size: 48px;
+    font-size: 36px;
 }
 
 .board-table {
+    width: 50%;
     border: black solid 2px;
     border-radius: 15px;
-    padding: 20px;
+    padding: 15px;
     background-color: blue;
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    align-content: center;
+}
+
+#first-player-tile {
+    background-color: yellow;
+    border-radius: 50%;
+    border: solid black 2px;
+    height: 80px;
+    width: 80px;
+    margin-right: 10px;
 }
 
 #gametype-select {
@@ -28,11 +41,18 @@ body {
     font-size: 48px;
 }
 
+header {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+
 .play-arrow {
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     border-style: solid;
-    border-color: white;
+    border-color: transparent;
     border-width: 0px 4px 4px 0px;
     transform: rotate(45deg);
 }
@@ -42,11 +62,15 @@ body {
 }
 
 .play-arrow-container {
-    width: 730px;
+    width: 644px;
     display: flex;
     justify-content: space-around;
-    margin-top: 10px;
     margin-bottom: 20px;
+}
+
+#player-list-container {
+    display: flex;
+    justify-content: center;
 }
 
 #player-names {
@@ -71,11 +95,17 @@ body {
     margin-top: 20px;
 }
 
+.row {
+    width: 100%; 
+    display: flex;
+    justify-content: space-around;
+}
+
 h1 {
     color:red;
     text-align: center;
     font-family: 'Shadows Into Light', cursive;
-    font-size: 96px;
+    font-size: 76px;
     text-shadow: 2px 2px blue;
 }
 
@@ -94,9 +124,29 @@ h3 {
     margin-bottom: 20px;
 }
 
+#replay-container {
+    margin-top: -380px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: 15%;
+    justify-content: space-around;
+}
+
+#second-player-tile {
+    background-color: red;
+    border: solid black 2px;
+    border-radius: 50%;
+    height: 80px;
+    width: 80px;
+    margin-left: 10px;
+}
+
 .slot {
-    height: 100px;
-    width: 100px;
+    height: 80px;
+    width: 80px;
+    margin: 5px;
     border-radius: 50%;
     background-color: rgb(205, 205, 205);
 }
@@ -104,5 +154,71 @@ h3 {
 #turn-status {
     text-align: center;
     font-family: 'Manrope', sans-serif;
-    font-size: 48px;
+    font-size: 36px;
+}
+
+@media (max-width: 830px) {
+    * {
+        font-size: 18px;
+    }
+
+    .board-table {
+        padding: 8px;
+
+    }
+
+    #first-player-tile {
+        height: 40px;
+        width: 40px;
+        margin-right: 5px;
+    }
+    
+
+    #gametype-select {
+        font-size: 24px;
+    }
+
+    h1 {
+        font-size: 38px;
+        text-shadow: 2px 2px blue;
+    }
+
+
+    h3 {
+        font-size: 24px;
+    }
+
+    .play-arrow {
+        border-color: lightgray;
+        height: 20px;
+        width: 20px;
+    }
+
+    .play-arrow-container {
+        width: 315px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+
+    #replay-container {
+        margin-top: -200px;
+    }
+
+    #second-player-tile {
+        height: 40px;
+        width: 40px;
+        margin-left: 5px;
+    }
+
+    .slot {
+        height: 40px;
+        width: 40px;
+        margin: 1.5px;
+        border-radius: 50%;
+        background-color: rgb(205, 205, 205);
+    }
+
+    #turn-status {
+        font-size: 18px;
+    }
 }

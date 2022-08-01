@@ -23,7 +23,6 @@ const gametypeSelect = document.getElementById('gametype-select');
 const playerSelectMenu = document.getElementById('player-select-menu');
 const playerSelectButton = document.getElementById('player-select-button');
 const playerNames = document.getElementById('player-names');
-const turnStatus = document.getElementById('turn-status');
 let playerOptionSelected = 'singleplayer';
 
 playerSelectMenu.addEventListener('change', function(event){
@@ -78,12 +77,24 @@ function startGame(){
         state.player2Name = playerNameInput2.value;
     }
     let playerList = document.createElement('h3');
-    playerList.setAttribute('id', 'player-list')
+    playerList.setAttribute('id', 'player-list');
+    let playerListContainer = document.createElement('div');
+    playerListContainer.setAttribute('id', 'player-list-container');
+    let firstPlayerTile = document.createElement('div');
+    let secondPlayerTile = document.createElement('div');
+    firstPlayerTile.setAttribute('id', 'first-player-tile');
+    secondPlayerTile.setAttribute('id', 'second-player-tile');
+    let turnStatusText = document.createElement('p');
+    turnStatusText.setAttribute('id', 'turn-status');
     if (!playerNameInput2){
         state.player2Name = 'Computer';
     }
     playerList.innerText = `Player 1: ${state.player1Name} vs Player 2: ${state.player2Name}`;
-    playerNames.appendChild(playerList);
+    playerListContainer.appendChild(firstPlayerTile);
+    playerListContainer.appendChild(playerList);
+    playerListContainer.appendChild(secondPlayerTile);
+    playerNames.appendChild(playerListContainer);
+    playerNames.appendChild(turnStatusText);
     playerNameContainer.remove();
     setBoard();
 }
@@ -109,7 +120,7 @@ function randomizeFirstPlay (){
         state.player1turn = false;
     }
     if (!state.player1turn && state.oneplayer) {
-        setTimeout(computerPlayTurn, 500);
+        setTimeout(computerPlayTurn, 600);
     }
 }
 
@@ -124,6 +135,7 @@ function determineTurn (){
 }
 
 function updateTurnStatusText() {
+    let turnStatus = document.getElementById('turn-status');
     if (state.player1turn) {
         state.currentPlayerName = `${state.player1Name}`;
         turnStatus.style.color = 'yellow';
@@ -392,6 +404,7 @@ function checkForDraw() {
 }
 
 function displayGameEndText(){
+    let turnStatus = document.getElementById('turn-status');
     if (state.win) {
     state.player1turn = state.player1turn !== true;
     turnStatus.innerText = `${state.currentPlayerName} Wins!`
@@ -404,7 +417,7 @@ function displayGameEndText(){
 function createReplayButton(){
     const replayContainer = document.getElementById('replay-container');
     replayButton = document.createElement('button');
-    replayButton.innerText = "Click here to play again!";
+    replayButton.innerText = "Play Again";
     replayContainer.appendChild(replayButton);
     replayButton.setAttribute('id', 'replay-button');
     replayButton.addEventListener('click', playAgain);
@@ -434,6 +447,7 @@ function playAgain(){
 }
 
 function backToMenu(){
+    let turnStatus = document.getElementById('turn-status');
     let currentArrowContainer = document.querySelector('.play-arrow-container');
     let currentBoardTable = document.querySelector('.board-table');
     let playerList = document.getElementById('player-list');
