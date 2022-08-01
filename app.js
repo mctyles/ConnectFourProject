@@ -99,55 +99,6 @@ function startGame(){
     setBoard();
 }
 
-function checkSlots(columnNum) {
-    for (let i = 5; i >= 0; i--) {
-        if (state.game[i][columnNum] === 0){
-            state.game[i][columnNum] = 'mark';
-            break;
-        }
-    }
-}
-
-function getRandomNum() {
-    return Math.floor(Math.random() * 6)
-}
-
-function randomizeFirstPlay (){
-    let randomNum = getRandomNum();
-    if (randomNum % 2 === 1) {
-        state.player1turn = true;
-    } else {
-        state.player1turn = false;
-    }
-    if (!state.player1turn && state.oneplayer) {
-        setTimeout(computerPlayTurn, 600);
-    }
-}
-
-function determineTurn (){
-    if (state.player1turn){
-        state.playerNumber = 1;
-        state.tileColor = 'yellow';
-    } else {
-        state.playerNumber = 2;
-        state.tileColor = 'red';
-    }
-}
-
-function updateTurnStatusText() {
-    let turnStatus = document.getElementById('turn-status');
-    if (state.player1turn) {
-        state.currentPlayerName = `${state.player1Name}`;
-        turnStatus.style.color = 'yellow';
-        turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';
-    } else {
-        state.currentPlayerName = `${state.player2Name}`
-        turnStatus.style.color = 'red';
-        turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';       
-    }
-    turnStatus.innerText = `It's ${state.currentPlayerName}'s turn! Click the arrow above the column you would like to play.`
-}
-
 function setBoard() {
     let rowCount = 0;   
     function makeRow(){
@@ -188,21 +139,76 @@ function setBoard() {
     randomizeFirstPlay();
     updateTurnStatusText();
     determineTurn();
+
+    let turnActive = false;
     
     playArrowContainer.addEventListener('click', function(event){ 
-        if (event.target.className === 'play-arrow' && !state.win){
-            let currentOpenSlot = '';
-            checkSlots(Number(event.target.id));
-            determineTurn();
-            playTurn();
-            if (state.oneplayer && !state.win) {
-                    setTimeout(computerPlayTurn, 600);
-                } 
-            }
+        if (!turnActive){
+            turnActive = true;
+            if (event.target.className === 'play-arrow' && !state.win){
+                let currentOpenSlot = '';
+                checkSlots(Number(event.target.id));
+                playTurn();
+                if (state.oneplayer && !state.win && state.game[state.rowNumPlayed][state.colNumPlayed] === 1) {
+                        setTimeout(computerPlayTurn, 600);
+                    } 
+                }
+        }
+        turnActive = false;
     });
 } 
 
+function checkSlots(columnNum) {
+    for (let i = 5; i >= 0; i--) {
+        if (state.game[i][columnNum] === 0){
+            state.game[i][columnNum] = 'mark';
+            break;
+        }
+    }
+}
+
+function getRandomNum() {
+    return Math.floor(Math.random() * 6)
+}
+
+function randomizeFirstPlay (){
+    let randomNum = getRandomNum();
+    if (randomNum % 2 === 1) {
+        state.player1turn = true;
+    } else {
+        state.player1turn = false;
+    }
+    if (!state.player1turn && state.oneplayer) {
+        setTimeout(computerPlayTurn, 600);
+    }
+}
+
+function determineTurn (){
+    if (state.player1turn){
+        state.playerNumber = 1;
+        state.tileColor = 'yellow';
+    } else {
+        state.playerNumber = 2;
+        state.tileColor = 'red';
+    }
+}
+
+function updateTurnStatusText() {
+    let turnStatus = document.getElementById('turn-status');
+    if (state.player1turn) {
+        state.currentPlayerName = `${state.player1Name}`;
+        turnStatus.style.color = '#F2E63D';
+        turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';
+    } else {
+        state.currentPlayerName = `${state.player2Name}`
+        turnStatus.style.color = '#D93030';
+        turnStatus.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';       
+    }
+    turnStatus.innerText = `It's ${state.currentPlayerName}'s turn! Click the arrow above the column you would like to play.`
+}
+
 function playTurn(){
+    determineTurn();
     for (let i = 5; i >= 0; i--) {
         if (state.game[i][Number(event.target.id)] === 'mark') {
             currentOpenSlot = document.getElementById(`row-${i}-slot-${Number(event.target.id)}`)
@@ -225,6 +231,25 @@ function playTurn(){
 
 function computerPlayTurn(){
     determineTurn();
+    computerPlayWinningTile();
+    if (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
+        computerBlockWin();
+    }
+    while (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
+        computerPlayRandomColumn();
+    }
+    state.player1turn = state.player1turn !== true;
+    checkForWin();
+    checkForDraw();
+    if (state.win || state.draw) {
+        displayGameEndText();
+        createReplayButton();
+    } else {
+        updateTurnStatusText();
+    }
+}
+
+function computerPlayWinningTile (){
     for (let i = 0; i < 7; i++){
         checkSlots(i);
         for (let j = 5; j >= 0; j--) {
@@ -238,6 +263,21 @@ function computerPlayTurn(){
                 currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
                 break;
                 } else {
+                    state.game[j][i] = 0;
+                    }
+                }
+            }
+            if (state.game[state.rowNumPlayed][state.colNumPlayed] === 2){
+                break;
+        }
+    }
+}
+
+function computerBlockWin(){
+    for (let i = 0; i < 7; i++){
+        checkSlots(i);
+        for (let j = 5; j >= 0; j--) {
+        if (state.game[j][i] === 'mark') {
                 state.game[j][i] = 1;
                 state.playerNumber = 1;
                 state.rowNumPlayed = j;
@@ -255,32 +295,23 @@ function computerPlayTurn(){
                     }
                 }
             }
-        }
-        if (state.game[state.rowNumPlayed][state.colNumPlayed] === 2){
-            break;
+            if (state.game[state.rowNumPlayed][state.colNumPlayed] === 2){
+                break;
+                }
             }
+}
+
+function computerPlayRandomColumn () {
+    let randomColumnNum = getRandomNum();
+    checkSlots(randomColumnNum);
+    for (let j = 5; j >= 0; j--) {
+        if (state.game[j][randomColumnNum] === 'mark'){
+        currentOpenSlot = document.getElementById(`row-${j}-slot-${randomColumnNum}`)
+        currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
+        state.game[j][randomColumnNum] = state.playerNumber;
+        state.rowNumPlayed = j;
+        state.colNumPlayed = randomColumnNum;
         }
-    while (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
-        let randomColumnNum = getRandomNum();
-        checkSlots(randomColumnNum);
-        for (let j = 5; j >= 0; j--) {
-            if (state.game[j][randomColumnNum] === 'mark'){
-            currentOpenSlot = document.getElementById(`row-${j}-slot-${randomColumnNum}`)
-            currentOpenSlot.style.backgroundColor = `${state.tileColor}`;
-            state.game[j][randomColumnNum] = state.playerNumber;
-            state.rowNumPlayed = j;
-            state.colNumPlayed = randomColumnNum;
-            }
-        }
-    }
-    state.player1turn = state.player1turn !== true;
-    checkForWin();
-    checkForDraw();
-    if (state.win || state.draw) {
-        displayGameEndText();
-        createReplayButton();
-    } else {
-        updateTurnStatusText();
     }
 }
 
@@ -415,7 +446,8 @@ function displayGameEndText(){
 }
 
 function createReplayButton(){
-    const replayContainer = document.getElementById('replay-container');
+    let replayContainer = document.createElement('section');
+    replayContainer.setAttribute('id', 'replay-container');
     replayButton = document.createElement('button');
     replayButton.innerText = "Play Again";
     replayContainer.appendChild(replayButton);
@@ -426,6 +458,7 @@ function createReplayButton(){
     replayContainer.appendChild(backToMenuButton);
     backToMenuButton.setAttribute('id', 'back-to-menu-button');
     backToMenuButton.addEventListener('click', backToMenu);
+    document.body.appendChild(replayContainer);
 }
 
 function boardReset(){
@@ -439,11 +472,13 @@ function boardReset(){
 }
 
 function playAgain(){
+    let replayContainer = document.getElementById('replay-container');
     initializeGame();
     updateTurnStatusText();
     boardReset();
     replayButton.remove();
     backToMenuButton.remove();
+    replayContainer.remove();
 }
 
 function backToMenu(){
@@ -451,6 +486,9 @@ function backToMenu(){
     let currentArrowContainer = document.querySelector('.play-arrow-container');
     let currentBoardTable = document.querySelector('.board-table');
     let playerList = document.getElementById('player-list');
+    let replayContainer = document.getElementById('replay-container');
+    let firstPlayerTile = document.getElementById('first-player-tile');
+    let secondPlayerTile = document.getElementById('second-player-tile');
     for (let i = 0; i < 7; i++){
         for (let j = 0; j < 6; j++){
             let currentSlot = document.getElementById(`row-${j}-slot-${i}`)
@@ -462,6 +500,10 @@ function backToMenu(){
     playerList.remove();
     turnStatus.innerText = '';
     document.body.appendChild(gametypeSelect);
+    replayContainer.remove();
+    firstPlayerTile.remove();
+    secondPlayerTile.remove();
     replayButton.remove();
     backToMenuButton.remove();
+    replayContainer.remove();
 }
