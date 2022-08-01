@@ -132,6 +132,7 @@ header {
 
 #replay-container > button:hover {
     background-color:rgb(186, 190, 240);
+    border: solid black 1px;
 }
 
 
