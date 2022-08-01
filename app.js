@@ -168,7 +168,7 @@ function checkSlots(columnNum) {
 }
 
 function getRandomNum() {
-    return Math.floor(Math.random() * 6)
+    return Math.floor(Math.random() * 7)
 }
 
 function randomizeFirstPlay (){
