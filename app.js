@@ -154,7 +154,6 @@ function setBoard() {
                     } 
                 }
         }
-        turnActive = false;
     });
 } 
 
@@ -247,6 +246,7 @@ function computerPlayTurn(){
     } else {
         updateTurnStatusText();
     }
+    turnActive = false;
 }
 
 function computerPlayWinningTile (){
