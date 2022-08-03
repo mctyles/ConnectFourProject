@@ -154,7 +154,7 @@ function setBoard() {
                     } 
                 }
         }
-        turnActive = true;
+        turnActive = false;
     });
 } 
 
