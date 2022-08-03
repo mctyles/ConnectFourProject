@@ -151,7 +151,9 @@ function setBoard() {
                 playTurn();
                 if (state.oneplayer && !state.win && state.game[state.rowNumPlayed][state.colNumPlayed] === 1) {
                         setTimeout(computerPlayTurn, 600);
-                    } 
+                    } else {
+                        turnActive = false;
+                    }
                 }
         }
     });
