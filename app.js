@@ -10,6 +10,7 @@ function initializeGame (){
                     [0, 0, 0, 0, 0, 0, 0]
             ];
     state.player1turn = true;
+    state.computerTurn = false;
     state.playerNumber = 0;
     state.tileColor = '';
     state.currentPlayerName = '';
@@ -143,14 +144,15 @@ function setBoard() {
     let turnActive = false;
     
     playArrowContainer.addEventListener('click', function(event){ 
-        if (!turnActive){
+        if (!state.computerTurn && !turnActive){
             turnActive = true;
             if (event.target.className === 'play-arrow' && !state.win){
                 let currentOpenSlot = '';
                 checkSlots(Number(event.target.id));
                 playTurn();
                 if (state.oneplayer && !state.win && state.game[state.rowNumPlayed][state.colNumPlayed] === 1) {
-                        setTimeout(computerPlayTurn, 600);
+                        state.computerTurn = true;
+                        computerPlayTurn();
                     } 
                 }
         }
@@ -179,7 +181,8 @@ function randomizeFirstPlay (){
         state.player1turn = false;
     }
     if (!state.player1turn && state.oneplayer) {
-        setTimeout(computerPlayTurn, 600);
+        state.computerTurn = true;
+        computerPlayTurn();
     }
 }
 
@@ -229,7 +232,9 @@ function playTurn(){
     }
 }
 
-function computerPlayTurn(){
+async function computerPlayTurn(){
+    await new Promise( resolve => {
+        setTimeout ( () => {
     determineTurn();
     computerPlayWinningTile();
     if (state.game[state.rowNumPlayed][state.colNumPlayed] !== 2) {
@@ -247,7 +252,10 @@ function computerPlayTurn(){
     } else {
         updateTurnStatusText();
     }
-}
+    state.computerTurn = false;
+    resolve();
+}, 600)
+})}
 
 function computerPlayWinningTile (){
     for (let i = 0; i < 7; i++){
